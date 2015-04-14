@@ -6,18 +6,19 @@ Created on Jan 27, 2015
 
 import pygame
 import random
+import datetime
 
 LEFT_SIDE, RIGHT_SIDE = xrange(2)
 SCREEN_WIDTH, SCREEN_HEIGHT = [19,14]
 RESET_TO_AI_TIMER = 300
 AI_DIFFICULTY = 0.2
-FRAMERATE = 30
+FRAMERATE = 3000
 exit_game = False
 
 class Paddle(pygame.sprite.Sprite):
     def __init__(self, side):
         super(Paddle, self).__init__()
-        self.image = pygame.Surface([1,3])
+        self.image = pygame.Surface([1,3]).convert()
         self.image.fill((255,255,255))
         self.rect = self.image.get_rect()
         if(side == LEFT_SIDE):
@@ -38,12 +39,11 @@ class Paddle(pygame.sprite.Sprite):
         #Make sure we don't collide with ourselves
         collisions.remove(self)
         if(collisions):
-            #Invert the velocity of the ball, and speed it up a bit
+            #Invert the x component of the velocity of the ball, and speed it up a bit
             #Make sure the ball doesn't bounce inside the paddle
             if(((self.side == LEFT_SIDE) and (collisions[0].velocity[0] < 0.0)) 
                or ((self.side == RIGHT_SIDE) and (collisions[0].velocity[0] > 0.0))):
                 collisions[0].velocity[0] *= -1.2
-            collisions[0].velocity[1] *= -1.2
             #If the ball hits the edge of the paddle, redirect it out a bit
             if(collisions[0].rect.centery < self.rect.centery): collisions[0].velocity[1] -= 0.20
             if(collisions[0].rect.centery > self.rect.centery): collisions[0].velocity[1] += 0.20
@@ -67,7 +67,7 @@ class Paddle(pygame.sprite.Sprite):
 class Ball(pygame.sprite.Sprite):
     def __init__(self):
         super(Ball, self).__init__()
-        self.image = pygame.Surface([2,2])
+        self.image = pygame.Surface([2,2]).convert()
         self.image.fill((255,255,255))
         self.rect = self.image.get_rect()
         self.reset(RIGHT_SIDE)
@@ -118,6 +118,9 @@ class Player(object):
     def stop(self):
         self.paddle.velocity[1] = 0.0
         
+    def displayScore(self):
+        self.score.displayScore()
+        
     def getPoint(self):
         self.score.addScore(1)
         
@@ -167,8 +170,12 @@ class Score(pygame.sprite.Sprite):
         self.reset()
         
     def reset(self):
-        self.flashTimer = self.flashTimerMax
         self.points = 0
+        self.displayScore()
+        self.image = self.number_sprites[self.points]
+        
+    def displayScore(self):
+        self.flashTimer = self.flashTimerMax
         self.image = self.number_sprites[self.points]
         
     def addScore(self, amt):
@@ -186,27 +193,35 @@ class Score(pygame.sprite.Sprite):
 if __name__ == '__main__':
     pygame.init()
     
+    gamecolour = (255,255,255) #initialize the game colour to white
+    #Pong is glad if it's friday
+    if(datetime.datetime.today().weekday() == 4):
+        gamecolour = (255,96,0)
+    
     #Initialize the display, create a clock and set the key repeat
     clock = pygame.time.Clock()
-    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.FULLSCREEN, 32)
+    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.FULLSCREEN, 8)
+    screen.set_palette([(0,0,0)]*256)
+    screen.set_palette_at(0, gamecolour)
     pygame.key.set_repeat(0, 10)
     
-    background = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
+    background = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT)).convert()
     background.fill((0,0,0))
     
     #Create the scoreboard sprites
     number_sprites = []
     
     #Load the other scoreboard sprites
-    numbers_image = pygame.image.load("ScoreBoard.png")
-    numbers_image.set_colorkey((255,0,255), pygame.RLEACCEL)
+    numbers_image = pygame.image.load("ScoreBoard.png").convert()
+    numbers_image.set_colorkey((0,0,0), pygame.RLEACCEL)
+    numbers_image.set_palette(screen.get_palette())
     for i in xrange(0, 10):
         number_sprites.append(numbers_image.subsurface((i*3,0,3,5)))
         
     #The last sprite is blank so we can not draw the scoreboard
-    blankimage = pygame.Surface([3,5])
-    blankimage.fill((255,0,255))
-    blankimage.set_colorkey((255,0,255), pygame.RLEACCEL)
+    blankimage = pygame.Surface([3,5]).convert()
+    blankimage.fill((0,0,0))
+    blankimage.set_colorkey((0,0,0), pygame.RLEACCEL)
     number_sprites.append(blankimage)
     
     #Create entities for the game
@@ -257,11 +272,13 @@ if __name__ == '__main__':
             
         #If the ball goes off screen, check which player gets a point, reset the ball
         if(ball.rect.x < -ball.rect.width):
+            players[0].displayScore()
             players[1].getPoint()
             ball.reset(RIGHT_SIDE)
             for paddle in paddles: paddle.reset()
         elif(ball.rect.x > SCREEN_WIDTH):
             players[0].getPoint()
+            players[1].displayScore()
             ball.reset(LEFT_SIDE)
             for paddle in paddles: paddle.reset()
             
