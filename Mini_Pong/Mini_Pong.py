@@ -7,6 +7,7 @@ Created on Jan 27, 2015
 import pygame
 import random
 import datetime
+import cwiid
 
 LEFT_SIDE, RIGHT_SIDE = xrange(2)
 SCREEN_WIDTH, SCREEN_HEIGHT = [19,14]
@@ -256,13 +257,33 @@ if __name__ == '__main__':
                 if (event.key == pygame.K_DOWN):
                     players[0].aiTimer = RESET_TO_AI_TIMER
                     players[0].moveDown()
+                if (event.key == pygame.K_RETURN):
+                    i = 2
+                    while not wm:
+                        try:
+                            wm = cwiid.Wiimote()
+                        except RuntimeError:
+                            if (i > 5):
+                                break
+                            i += 1
+                    if wm != None:
+                        wm.rpt_mode = cwiid.RPT_BTN | cwiid.RPT_IR
+                        wm.led = 1
             elif (event.type == pygame.KEYUP):
-                if (event.key == pygame.K_UP):
-                    players[0].aiTimer = RESET_TO_AI_TIMER
+                if (event.key == pygame.K_UP) or (event.key == pygame.K_DOWN):
+                    players[0].resetAITimer()
                     players[0].stop()
-                if (event.key == pygame.K_DOWN):
-                    players[0].aiTimer = RESET_TO_AI_TIMER
-                    players[0].stop()
+            
+        if wm != None:
+            buttons = wm.state['buttons']
+            if buttons & cwiid.BTN_UP | buttons & cwiid.BTN_RIGHT:
+                players[0].resetAITimer()
+                players[0].moveUp()
+            elif buttons & cwiid.BTN_DOWN | buttons & cwiid.BTN_LEFT:
+                players[0].resetAITimer()
+                players[0].moveDown()
+            else:
+                players[0].stop()    
             
         #Update the sprites
         sprites.update()
