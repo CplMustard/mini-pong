@@ -206,6 +206,7 @@ if __name__ == '__main__':
     screen.set_palette([(0,0,0)]*256)
     screen.set_palette_at(0, gamecolour)
     ledarray = LedArray.LedArray((SCREEN_WIDTH, SCREEN_HEIGHT))
+    wm = None
     pygame.key.set_repeat(0, 10)
     
     background = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT)).convert()
