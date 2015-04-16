@@ -130,6 +130,9 @@ class Player(object):
         self.paddle.reset()
         self.score.reset()
         
+    def resetAITimer(self):
+        self.aiTimer = RESET_TO_AI_TIMER
+
     def update(self):
         #Check if this player has been idle for a while, if so, we should be using AI
         if(self.aiTimer != 0):
@@ -255,10 +258,10 @@ if __name__ == '__main__':
                 if (event.key == pygame.K_ESCAPE):
                     exit_game = True
                 if (event.key == pygame.K_UP):
-                    players[0].aiTimer = RESET_TO_AI_TIMER
+                    players[0].resetAITimer()
                     players[0].moveUp()
                 if (event.key == pygame.K_DOWN):
-                    players[0].aiTimer = RESET_TO_AI_TIMER
+                    players[0].resetAITimer()
                     players[0].moveDown()
                 if (event.key == pygame.K_RETURN):
                     i = 2
