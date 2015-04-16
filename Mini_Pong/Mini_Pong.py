@@ -4,6 +4,7 @@ Created on Jan 27, 2015
 @author: Jack
 '''
 
+import LedArray
 import pygame
 import random
 import datetime
@@ -204,6 +205,7 @@ if __name__ == '__main__':
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.FULLSCREEN, 8)
     screen.set_palette([(0,0,0)]*256)
     screen.set_palette_at(0, gamecolour)
+    ledarray = LedArray.LedArray((SCREEN_WIDTH, SCREEN_HEIGHT))
     pygame.key.set_repeat(0, 10)
     
     background = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT)).convert()
@@ -313,6 +315,7 @@ if __name__ == '__main__':
         score_sprites.draw(screen)
         sprites.draw(screen)
         pygame.display.flip()
+        ledarray.displayPygameScreen(screen)
         clock.tick(FRAMERATE)
         
     exit()
