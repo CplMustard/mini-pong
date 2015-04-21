@@ -14,7 +14,7 @@ LEFT_SIDE, RIGHT_SIDE = xrange(2)
 SCREEN_WIDTH, SCREEN_HEIGHT = [19,14]
 RESET_TO_AI_TIMER = 300
 AI_DIFFICULTY = 0.2
-FRAMERATE = 3000
+FRAMERATE = 30
 exit_game = False
 
 class Paddle(pygame.sprite.Sprite):
@@ -67,12 +67,12 @@ class Paddle(pygame.sprite.Sprite):
         self.checkCollisions()
         
 class Ball(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, side):
         super(Ball, self).__init__()
         self.image = pygame.Surface([2,2]).convert()
         self.image.fill((255,255,255))
         self.rect = self.image.get_rect()
-        self.reset(RIGHT_SIDE)
+        self.reset(side)
         self.maxspeed = 0.95
         
     def reset(self, last_point):
@@ -199,9 +199,6 @@ if __name__ == '__main__':
     pygame.init()
     
     gamecolour = (255,255,255) #initialize the game colour to white
-    #Pong is glad if it's friday
-    if(datetime.datetime.today().weekday() == 4):
-        gamecolour = (255,96,0)
     
     #Initialize the display, create a clock and set the key repeat
     clock = pygame.time.Clock()
@@ -232,7 +229,11 @@ if __name__ == '__main__':
     number_sprites.append(blankimage)
     
     #Create entities for the game
-    ball = Ball()
+	if(random.random() > 0.5):
+		side == RIGHT_SIDE
+	else:
+		side == LEFT_SIDE
+    ball = Ball(side)
     paddles = (Paddle(LEFT_SIDE), Paddle(RIGHT_SIDE))
     scoreboard = (Score(number_sprites, LEFT_SIDE), Score(number_sprites, RIGHT_SIDE))
     players = (Player(paddles[0], scoreboard[0], LEFT_SIDE), Player(paddles[1], scoreboard[1], RIGHT_SIDE))
@@ -249,6 +250,11 @@ if __name__ == '__main__':
         score_sprites.add(score)
     
     while(not exit_game):
+	
+		#Pong is glad if it's friday
+		if(datetime.datetime.today().weekday() == 4):
+			gamecolour = (255,96,0)
+			screen.set_palette_at(0, gamecolour)
         
         #Check for new key events
         for event in pygame.event.get():
@@ -282,6 +288,11 @@ if __name__ == '__main__':
             
         if wm != None:
             buttons = wm.state['buttons']
+			ir = wm.state['ir_src']
+			if buttons & cwiid.BTN_B:
+				for src in ir:
+					if src:
+						players[0].paddle.position[1] = src['pos'][1]*14.0
             if buttons & cwiid.BTN_UP | buttons & cwiid.BTN_RIGHT:
                 players[0].resetAITimer()
                 players[0].moveUp()
@@ -311,7 +322,11 @@ if __name__ == '__main__':
             
         #If one player gets more than 9 points end the game and reset everything
         if((players[0].score.points > 9) or (players[1].score.points > 9)):
-            ball.reset(RIGHT_SIDE)
+			if(random.random() > 0.5):
+				side == RIGHT_SIDE
+			else:
+				side == LEFT_SIDE
+            ball.reset(side)
             for player in players: player.reset()
             
         #Draw everything and wait one frame length
