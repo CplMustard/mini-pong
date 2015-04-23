@@ -293,11 +293,10 @@ if __name__ == '__main__':
         if wm != None:
             buttons = wm.state['buttons']
             ir = wm.state['ir_src']
-            if buttons & cwiid.BTN_B:
-                for src in ir:
-                    if src:
-                        players[0].paddle.position[1] = (float(src['pos'][1])/1000.0)*14.0
-                        print (float(src['pos'][1])/1000.0)*14.0
+            for src in ir:
+                if src:
+                    players[0].paddle.position[1] = (float(src['pos'][1])/1000.0)*14.0
+                    print (float(src['pos'][1])/1000.0)*14.0
             if buttons & cwiid.BTN_UP | buttons & cwiid.BTN_RIGHT:
                 players[0].resetAITimer()
                 players[0].moveUp()
