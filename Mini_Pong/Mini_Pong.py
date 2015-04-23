@@ -295,14 +295,15 @@ if __name__ == '__main__':
             ir = wm.state['ir_src']
             for src in ir:
                 if src:
-                    players[0].paddle.position[1] = (float(src['pos'][1])/800.0)*14.0
+                    players[0].paddle.position[1] = (float(src['pos'][1])/750.0)*14.0
             if buttons & cwiid.BTN_UP | buttons & cwiid.BTN_RIGHT:
                 players[0].resetAITimer()
                 players[0].moveUp()
             elif buttons & cwiid.BTN_DOWN | buttons & cwiid.BTN_LEFT:
                 players[0].resetAITimer()
                 players[0].moveDown()
-            else:
+            elif(players[0].paddle.velocity[1] != 0.0):
+                players[0].resetAITimer()
                 players[0].stop()    
             
         #Update the sprites
