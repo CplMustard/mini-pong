@@ -13,6 +13,7 @@ import cwiid
 LEFT_SIDE, RIGHT_SIDE = xrange(2)
 SCREEN_WIDTH, SCREEN_HEIGHT = [19,14]
 RESET_TO_AI_TIMER = 300
+WIIMOTE_TIMEOUT = 1000
 AI_DIFFICULTY = 0.2
 FRAMERATE = 30
 exit_game = False
@@ -206,7 +207,10 @@ if __name__ == '__main__':
     screen.set_palette([(0,0,0)]*256)
     screen.set_palette_at(0, gamecolour)
     ledarray = LedArray.LedArray((SCREEN_WIDTH, SCREEN_HEIGHT))
-    wm = None
+    wm = [None, None]
+    button_up_state = button_down_state = []
+    button_up_state[0] = button_down_state[0] = False
+    button_up_state[1] = button_down_state[1] = False
     pygame.key.set_repeat(0, 10)
     
     background = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT)).convert()
@@ -267,48 +271,67 @@ if __name__ == '__main__':
             elif (event.type == pygame.KEYDOWN):
                 if (event.key == pygame.K_ESCAPE):
                     exit_game = True
-                if (event.key == pygame.K_UP):
+                if (event.key == pygame.K_W):
                     players[0].resetAITimer()
                     players[0].moveUp()
-                if (event.key == pygame.K_DOWN):
+                if (event.key == pygame.K_S):
                     players[0].resetAITimer()
                     players[0].moveDown()
+                if (event.key == pygame.K_UP):
+                    players[1].resetAITimer()
+                    players[1].moveUp()
+                if (event.key == pygame.K_DOWN):
+                    players[1].resetAITimer()
+                    players[1].moveDown()
                 if (event.key == pygame.K_RETURN):
-                    i = 2
-                    while not wm:
+                    i = 0
+                    for i in xrange(len(wm)):
+                        if(wm[i]): i += 1
+                    attempt = 2
+                    while not wm[i]:
                         try:
-                            wm = cwiid.Wiimote()
+                            wm[i] = cwiid.Wiimote()
                         except RuntimeError:
-                            if (i > 5):
+                            if (attempt > 5):
                                 break
-                            i += 1
-                    if wm != None:
-                        wm.rpt_mode = cwiid.RPT_BTN | cwiid.RPT_IR
-                        wm.led = 1
+                            attempt += 1
+                    if wm[i] != None:
+                        wm[i].rpt_mode = cwiid.RPT_BTN | cwiid.RPT_IR
+                        wm[i].led = i + 1
+                        wiimote_timeout[i] = WIIMOTE_TIMEOUT_MAX
             elif (event.type == pygame.KEYUP):
-                if (event.key == pygame.K_UP) or (event.key == pygame.K_DOWN):
+                if (event.key == pygame.K_W) or (event.key == pygame.K_S):
                     players[0].resetAITimer()
                     players[0].stop()
+                if (event.key == pygame.K_UP) or (event.key == pygame.K_DOWN):
+                    players[1].resetAITimer()
+                    players[1].stop()
             
-        if wm != None:
-            buttons = wm.state['buttons']
-            ir = wm.state['ir_src']
-            for src in ir:
-                if src:
-                    players[0].paddle.position[1] = (float(src['pos'][1])/750.0)*14.0
-            if buttons & cwiid.BTN_UP | buttons & cwiid.BTN_RIGHT:
-                players[0].resetAITimer()
-                players[0].moveUp()
-                button_up_state = True
-            elif buttons & cwiid.BTN_DOWN | buttons & cwiid.BTN_LEFT:
-                players[0].resetAITimer()
-                players[0].moveDown()
-                button_down_state = True
-            elif(button_up_state or button_down_state):
-                players[0].resetAITimer()
-                players[0].stop()    
-                button_up_state = False
-                button_down_state = False
+        for i in xrange(len(wm))
+            if wm[i] != None:
+                buttons = wm[i].state['buttons']
+                ir = wm[i].state['ir_src']
+                for src in ir:
+                    if src:
+                        players[i].paddle.position[1] = (float(src['pos'][1])/750.0)*14.0
+                if buttons & cwiid.BTN_UP | buttons & cwiid.BTN_RIGHT:
+                    players[i].resetAITimer()
+                    players[i].moveUp()
+                    button_up_state[i] = True
+                elif buttons & cwiid.BTN_DOWN | buttons & cwiid.BTN_LEFT:
+                    players[i].resetAITimer()
+                    players[i].moveDown()
+                    button_down_state[i] = True
+                elif(button_up_state or button_down_state):
+                    players[i].resetAITimer()
+                    players[i].stop()    
+                    button_up_state[i] = False
+                    button_down_state[i] = False
+                else:
+                    wiimote_timeout[i] -= 1
+                    if(wiimote_timeout[i] <= 0):
+                        wm[i].close()
+                        wm[i] = None
             
         #Update the sprites
         sprites.update()
