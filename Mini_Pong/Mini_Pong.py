@@ -202,7 +202,7 @@ if __name__ == '__main__':
     
     #Initialize the display, create a clock and set the key repeat
     clock = pygame.time.Clock()
-    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.FULLSCREEN, 8)
+    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), 0, 8)
     screen.set_palette([(0,0,0)]*256)
     screen.set_palette_at(0, gamecolour)
     ledarray = LedArray.LedArray((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -256,6 +256,9 @@ if __name__ == '__main__':
         if(datetime.datetime.today().weekday() == 4):
             gamecolour = (255,96,0)
             screen.set_palette_at(0, gamecolour)
+        else:
+            gamecolour = (255,255,255)
+            screen.set_palette_at(0, gamecolour)
         
         #Check for new key events
         for event in pygame.event.get():
@@ -293,7 +296,8 @@ if __name__ == '__main__':
             if buttons & cwiid.BTN_B:
                 for src in ir:
                     if src:
-                        players[0].paddle.position[1] = src['pos'][1]*14.0
+                        players[0].paddle.position[1] = (float(src['pos'][1])/1000.0)*14.0
+                        print (float(src['pos'][1])/1000.0)*14.0
             if buttons & cwiid.BTN_UP | buttons & cwiid.BTN_RIGHT:
                 players[0].resetAITimer()
                 players[0].moveUp()
