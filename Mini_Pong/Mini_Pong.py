@@ -229,10 +229,11 @@ if __name__ == '__main__':
     number_sprites.append(blankimage)
     
     #Create entities for the game
+    side = LEFT_SIDE
     if(random.random() > 0.5):
-        side == RIGHT_SIDE
+        side = RIGHT_SIDE
     else:
-        side == LEFT_SIDE
+        side = LEFT_SIDE
     ball = Ball(side)
     paddles = (Paddle(LEFT_SIDE), Paddle(RIGHT_SIDE))
     scoreboard = (Score(number_sprites, LEFT_SIDE), Score(number_sprites, RIGHT_SIDE))
@@ -322,10 +323,11 @@ if __name__ == '__main__':
             
         #If one player gets more than 9 points end the game and reset everything
         if((players[0].score.points > 9) or (players[1].score.points > 9)):
+            side = LEFT_SIDE
             if(random.random() > 0.5):
-                side == RIGHT_SIDE
+                side = RIGHT_SIDE
             else:
-                side == LEFT_SIDE
+                side = LEFT_SIDE
             ball.reset(side)
             for player in players: player.reset()
             
