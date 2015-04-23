@@ -299,12 +299,16 @@ if __name__ == '__main__':
             if buttons & cwiid.BTN_UP | buttons & cwiid.BTN_RIGHT:
                 players[0].resetAITimer()
                 players[0].moveUp()
+                button_up_state = True
             elif buttons & cwiid.BTN_DOWN | buttons & cwiid.BTN_LEFT:
                 players[0].resetAITimer()
                 players[0].moveDown()
-            elif(players[0].paddle.velocity[1] != 0.0):
+                button_down_state = True
+            elif(button_up_state or button_down_state):
                 players[0].resetAITimer()
                 players[0].stop()    
+                button_up_state = False
+                button_down_state = False
             
         #Update the sprites
         sprites.update()
