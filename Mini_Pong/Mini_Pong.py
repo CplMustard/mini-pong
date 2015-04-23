@@ -207,6 +207,7 @@ if __name__ == '__main__':
     screen.set_palette_at(0, gamecolour)
     ledarray = LedArray.LedArray((SCREEN_WIDTH, SCREEN_HEIGHT))
     wm = None
+    button_up_state = button_down_state = False
     pygame.key.set_repeat(0, 10)
     
     background = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT)).convert()
