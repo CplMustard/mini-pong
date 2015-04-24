@@ -13,7 +13,7 @@ import cwiid
 LEFT_SIDE, RIGHT_SIDE = xrange(2)
 SCREEN_WIDTH, SCREEN_HEIGHT = [19,14]
 RESET_TO_AI_TIMER = 300
-WIIMOTE_TIMEOUT = 1000
+WIIMOTE_TIMEOUT_MAX = 1000
 AI_DIFFICULTY = 0.2
 FRAMERATE = 30
 exit_game = False
@@ -208,9 +208,8 @@ if __name__ == '__main__':
     screen.set_palette_at(0, gamecolour)
     ledarray = LedArray.LedArray((SCREEN_WIDTH, SCREEN_HEIGHT))
     wm = [None, None]
-    button_up_state = button_down_state = []
-    button_up_state[0] = button_down_state[0] = False
-    button_up_state[1] = button_down_state[1] = False
+    button_up_state = button_down_state = [False, False]
+    wiimote_timeout = [0, 0]
     pygame.key.set_repeat(0, 10)
     
     background = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT)).convert()
@@ -271,10 +270,10 @@ if __name__ == '__main__':
             elif (event.type == pygame.KEYDOWN):
                 if (event.key == pygame.K_ESCAPE):
                     exit_game = True
-                if (event.key == pygame.K_W):
+                if (event.key == pygame.K_w):
                     players[0].resetAITimer()
                     players[0].moveUp()
-                if (event.key == pygame.K_S):
+                if (event.key == pygame.K_s):
                     players[0].resetAITimer()
                     players[0].moveDown()
                 if (event.key == pygame.K_UP):
@@ -285,8 +284,8 @@ if __name__ == '__main__':
                     players[1].moveDown()
                 if (event.key == pygame.K_RETURN):
                     i = 0
-                    for i in xrange(len(wm)):
-                        if(wm[i]): i += 1
+                    for j in xrange(len(wm)):
+                        if(wm[j]): i += 1
                     attempt = 2
                     while not wm[i]:
                         try:
@@ -300,14 +299,14 @@ if __name__ == '__main__':
                         wm[i].led = i + 1
                         wiimote_timeout[i] = WIIMOTE_TIMEOUT_MAX
             elif (event.type == pygame.KEYUP):
-                if (event.key == pygame.K_W) or (event.key == pygame.K_S):
+                if (event.key == pygame.K_w) or (event.key == pygame.K_s):
                     players[0].resetAITimer()
                     players[0].stop()
                 if (event.key == pygame.K_UP) or (event.key == pygame.K_DOWN):
                     players[1].resetAITimer()
                     players[1].stop()
             
-        for i in xrange(len(wm))
+        for i in xrange(len(wm)):
             if wm[i] != None:
                 buttons = wm[i].state['buttons']
                 ir = wm[i].state['ir_src']
