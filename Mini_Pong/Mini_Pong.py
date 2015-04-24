@@ -313,19 +313,23 @@ if __name__ == '__main__':
                 for src in ir:
                     if src:
                         players[i].paddle.position[1] = (float(src['pos'][1])/750.0)*14.0
+                        wiimote_timeout[i] = WIIMOTE_TIMEOUT_MAX
                 if buttons & cwiid.BTN_UP | buttons & cwiid.BTN_RIGHT:
                     players[i].resetAITimer()
                     players[i].moveUp()
                     button_up_state[i] = True
+                    wiimote_timeout[i] = WIIMOTE_TIMEOUT_MAX
                 elif buttons & cwiid.BTN_DOWN | buttons & cwiid.BTN_LEFT:
                     players[i].resetAITimer()
                     players[i].moveDown()
                     button_down_state[i] = True
+                    wiimote_timeout[i] = WIIMOTE_TIMEOUT_MAX
                 elif(button_up_state[i] or button_down_state[i]):
                     players[i].resetAITimer()
                     players[i].stop()    
                     button_up_state[i] = False
                     button_down_state[i] = False
+                    wiimote_timeout[i] = WIIMOTE_TIMEOUT_MAX
                 else:
                     wiimote_timeout[i] -= 1
                     if(wiimote_timeout[i] <= 0):
