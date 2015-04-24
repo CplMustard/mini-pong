@@ -13,7 +13,7 @@ import cwiid
 LEFT_SIDE, RIGHT_SIDE = xrange(2)
 SCREEN_WIDTH, SCREEN_HEIGHT = [19,14]
 RESET_TO_AI_TIMER = 300
-WIIMOTE_TIMEOUT_MAX = 1000
+WIIMOTE_TIMEOUT_MAX = 600
 AI_DIFFICULTY = 0.2
 FRAMERATE = 30
 exit_game = False
@@ -321,7 +321,7 @@ if __name__ == '__main__':
                     players[i].resetAITimer()
                     players[i].moveDown()
                     button_down_state[i] = True
-                elif(button_up_state or button_down_state):
+                elif(button_up_state[i] or button_down_state[i]):
                     players[i].resetAITimer()
                     players[i].stop()    
                     button_up_state[i] = False
