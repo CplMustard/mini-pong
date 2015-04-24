@@ -285,9 +285,9 @@ if __name__ == '__main__':
                 if (event.key == pygame.K_RETURN):
                     i = 0
                     for j in xrange(len(wm)):
-                        if(wm[j]): i += 1
+                        if(wm[j] != None): i += 1
                     attempt = 2
-                    while not wm[i]:
+                    while wm[i] == None:
                         try:
                             wm[i] = cwiid.Wiimote()
                         except RuntimeError:
@@ -314,6 +314,7 @@ if __name__ == '__main__':
                     if src:
                         players[i].paddle.position[1] = (float(src['pos'][1])/750.0)*14.0
                         wiimote_timeout[i] = WIIMOTE_TIMEOUT_MAX
+                        players[i].resetAITimer()
                 if buttons & cwiid.BTN_UP | buttons & cwiid.BTN_RIGHT:
                     players[i].resetAITimer()
                     players[i].moveUp()
