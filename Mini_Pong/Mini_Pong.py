@@ -284,7 +284,7 @@ if __name__ == '__main__':
                     players[1].moveDown()
                 if (event.key == pygame.K_RETURN):
                     i = 0
-                    for j in xrange(len(wm)):
+                    for j in xrange(len(wm)-1):
                         if(wm[j] != None): i += 1
                     attempt = 2
                     while wm[i] == None:
